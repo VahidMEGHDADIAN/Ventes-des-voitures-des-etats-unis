@@ -5,25 +5,30 @@ import numpy as np
 st.title('Ventes des voitures aux Etats-Unis')
 
 df = pd.read_csv("car_prices_clean.csv")
+# Charge le fichier CSV dans un DataFrame df.
 
 st.dataframe(df)  # Same as st.write(df)
 
 # Choisir la colonne pour le tri
 colonne_tri = st.selectbox("Sélectionnez la colonne pour trier les données :", options=df.columns)
+# Utilise un selectbox pour sélectionner une colonne pour le tri parmi celles de df
 
 # Choisir l'ordre de tri (ascendant ou descendant)
 ordre_tri = st.selectbox("Sélectionnez l'ordre de tri :", options=["Ascendant", "Descendant"])
+# Propose de trier en "Ascendant" ou "Descendant".
 
 # Si une colonne est sélectionnée, trier le DataFrame
 if colonne_tri:
     # Utiliser sort_values avec l'ordre de tri choisi
     df = df.sort_values(by=colonne_tri, ascending=(ordre_tri == "Ascendant"))
+    # Trie le DataFrame df selon la colonne et l'ordre sélectionnés.
 
 # Afficher le DataFrame trié
 st.dataframe(df)
 
 # Convertir la colonne 'make' (marque_du_véhicule) en type catégoriel
 df['make'] = df['make'].astype('category')
+# Modifie la colonne make pour être de type category, ce qui permet de mieux gérer les valeurs pour les filtres.
 
 # Initialisation de la DataFrame filtrée
 df_filtre = df
@@ -35,11 +40,13 @@ marque_selectionnee = st.selectbox("Sélectionnez une marque de véhicule :", op
 # Filtrer le DataFrame en fonction de la marque sélectionnée
 if marque_selectionnee:
     df_filtre = df_filtre[df_filtre['make'].isin([marque_selectionnee])]
+    # Crée un selectbox pour sélectionner une marque de véhicule et filtre df_filtre selon cette sélection.
 
 # Filtrer par année (exemple pour une colonne numérique)
 if 'year' in df.columns:
     min_year, max_year = int(df['year'].min()), int(df['year'].max())
     year_range = st.slider("Sélectionnez la plage d'années :", min_value=min_year, max_value=max_year, value=(min_year, max_year))
+    # Utilise un slider pour sélectionner une plage d'années et filtre df_filtre selon cette plage.
 
     # Filtrer le DataFrame en fonction de la plage d'années sélectionnée
     df_filtre = df_filtre[df_filtre['year'].between(year_range[0], year_range[1])]
@@ -51,6 +58,7 @@ if 'odometer' in df.columns:
 
     # Filtrer le DataFrame en fonction de la plage de kilométrage sélectionnée
     df_filtre = df_filtre[df_filtre['odometer'].between(odometer_range[0], odometer_range[1])]
+    # Utilise un slider pour sélectionner une plage de kilométrage et filtre df_filtre en conséquence.
 
 # Afficher le DataFrame final filtré
 st.dataframe(df_filtre)
@@ -67,6 +75,10 @@ for col in df.columns:
     if pd.api.types.is_categorical_dtype(df[col]) or df[col].dtype == 'object':
         options = df[col].dropna().unique()  # Récupérer les valeurs uniques pour le filtre
         choix = st.sidebar.multiselect(f"Sélectionnez les valeurs pour '{col}' :", options=options)
+        #Crée des filtres dynamiques pour chaque colonne :
+        # Pour les colonnes catégorielles et textuelles (object), il propose un multiselect.
+        # Pour les colonnes numériques, un slider.
+        # Pour les colonnes de date, un date_input.
 
         # Filtrer si des valeurs sont sélectionnées
         if choix:
@@ -101,6 +113,7 @@ def to_excel(dataframe):
     excel_file = 'donnees_filtrees.xlsx'
     dataframe.to_excel(excel_file, index=False, sheet_name='Données Filtrées')
     return excel_file
+# La fonction to_excel crée un fichier Excel à partir de dataframe.
 
 # Bouton de téléchargement
 excel_file = to_excel(df_filtre)  # Utiliser df_filtre ici, car il contient les données filtrées
@@ -116,6 +129,7 @@ st.title("Groupement des données")
 
 # Interface utilisateur pour choisir la colonne de groupement
 colonne_group = st.selectbox("Sélectionnez la colonne pour le groupement :", options=df.select_dtypes(include=['category', 'object']).columns)
+# Sélectionne la colonne pour le groupement parmi les colonnes catégorielles et textuelles.
 
 # Interface pour choisir les colonnes à agréger
 # Sélectionner seulement les colonnes numériques pour l'agrégation
@@ -125,6 +139,7 @@ colonnes_choisies = st.multiselect("Sélectionnez les colonnes numériques à ag
 # Interface pour choisir les fonctions d'agrégation
 fonctions_agregation = ['sum', 'mean', 'min', 'max', 'count']
 fonction_choisie = st.selectbox("Sélectionnez la fonction d'agrégation :", options=fonctions_agregation)
+# Permet de choisir une fonction d'agrégation parmi sum, mean, min, max, et count.
 
 # Vérifier que la fonction d'agrégation choisie est compatible avec les types de données
 if colonne_group and colonnes_choisies:
@@ -138,6 +153,7 @@ if colonne_group and colonnes_choisies:
         st.dataframe(df_grouped)
     except Exception as e:
         st.error(f"Erreur lors du groupement des données : {e}")
+        # Utilise groupby pour grouper les données et appliquer la fonction d’agrégation sélectionnée.
 
 
 
