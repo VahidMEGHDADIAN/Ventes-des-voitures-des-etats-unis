@@ -1,0 +1,12 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+
+# Ignorer l'environnement virtuel
+streamlit-crash-course/venv/
+
+# Ignorer les fichiers non suivis ou indésirables
+streamlit-crash-course/car_prices_clean.csv:Zone.Identifier
